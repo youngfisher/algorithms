@@ -10,9 +10,10 @@ struct HeapNode{
     int index;
     int left;
     int right;
+    int parent;
 
     HeapNode(const int i)
-        :index{i},left{2*i},right{2*i+1}{}
+        :index{i},left{2*i},right{2*i+1},parent{i/2}{}
 
 };
 

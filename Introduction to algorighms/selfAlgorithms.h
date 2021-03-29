@@ -4,7 +4,7 @@
 
 #include "chapter5_1_2.h"
 #include "matrix_chain_multiplication_least_times.h"
-#include "BuildMaxHeap.h"
-#include "HeapSort.h"
+#include "Heap.h"
+
 
 #endif

@@ -19,7 +19,7 @@ void HeapSort(vector<int> &A, int flag);//sorting from small to big if flag == 1
 class MaxPriorityQueue;
 class MinPriorityQueue;
 
-class PriorityQueue{
+class PriorityQueue{//surrogate class to hide information of true class MaxPriorityQueue and MinPriorityQueue
     public:
         PriorityQueue(const vector<int>& A, string queueType);//queueType == "max" or "min"
         PriorityQueue(vector<int>&& A, string queueType);

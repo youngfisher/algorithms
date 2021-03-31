@@ -159,6 +159,272 @@ void BuildMaxHeap(vector<int> &A){
         max_Heapify(A,i,heapSize);
 }
 
+class MaxPriorityQueue{
+    
+    public:
+        MaxPriorityQueue(const vector<int>& A){
+            this->Set = A;
+            this->len = A.size();
+            BuildMaxHeap(this->Set);
+            cout << "copy constructor of MaxPriorityQueue" << endl;
+            
+        }
+        MaxPriorityQueue(vector<int>&& A){
+            len = A.size();
+            Set = std::move(A);
+            BuildMaxHeap(Set);
+            cout << "move constructor of MaxPriorityQueue" << endl;
+        }
+        ~MaxPriorityQueue(){
+            cout << "MaxPriorityQueue destructor" << endl;
+        }
+
+        void PrintQueue() const{
+
+            for(int i=0;i<this->len;i++)
+                cout << this->Set[i] << " ";
+                cout << endl;
+        }
+
+        int Maximum() const{           
+            cout << this->Set[0] << endl;
+            return this->Set[0];
+        }
+
+        int ExtractMaximum(){
+            int heapSize = len;
+            if(heapSize < 1)
+                cout << "heap underflow";
+            int max = this->Set[0];
+            this->Set[0] = this->Set[heapSize-1];
+            heapSize--;
+            max_Heapify(this->Set,1,heapSize);
+            cout << max << endl;
+            return max;
+        }
+
+        void IncreaseKey(int i, int key){//index i ranges between 1 and length of the heap
+            if(key < this->Set[i-1]){
+                cout << "new key is smaller than current key" << endl;
+                return;
+            }
+            this->Set[i-1] = key;
+            HeapNode current = HeapNode(i);
+            int parent = current.parent;
+            while(current.index > 1 && this->Set[parent-1] < this->Set[current.index-1]){
+                swap(this->Set[parent-1],this->Set[current.index-1]);
+                current = HeapNode(parent);
+                parent  = current.parent;
+            }
+
+        }
+
+        void Insert(int key){
+            int heapSize = len;
+            heapSize++;
+            this->Set.push_back(-1000);
+            this->IncreaseKey(heapSize,key);
+        }
+
+    private:
+        vector<int> Set;
+        int len;
+       
+};
+
+class MinPriorityQueue{
+    
+    public:
+        MinPriorityQueue(const vector<int>& A){
+            this->Set = A;
+            this->len = A.size();
+            BuildMinHeap(this->Set);
+            cout << "copy constructor of MinPriorityQueue" << endl;
+            
+        }
+        MinPriorityQueue(vector<int>&& A){
+            len = A.size();
+            Set = std::move(A);
+            BuildMinHeap(Set);            
+            cout << "move constructor of MinPriorityQueue" << endl;
+        }
+        ~MinPriorityQueue(){
+            cout << "MinPriorityQueue destructor" << endl;
+        }
+
+        void PrintQueue() const{
+
+            for(int i=0;i<this->len;i++)
+                cout << this->Set[i] << " ";
+                cout << endl;
+        }
+
+        int Minimum() const{           
+            cout << this->Set[0] << endl;
+            return this->Set[0];
+        }
+
+        int ExtractMinimum(){
+            int heapSize = len;
+            if(heapSize < 1)
+                cout << "heap underflow";
+            int min = this->Set[0];
+            this->Set[0] = this->Set[heapSize-1];
+            heapSize--;
+            min_Heapify(this->Set,1,heapSize);
+            cout << min << endl;
+            return min;
+        }
+
+        void DecreaseKey(int i, int key){//index i ranges between 1 and length of the heap
+            if(key > this->Set[i-1]){
+                cout << "new key is larger than current key" << endl;
+                return;
+            }
+
+            this->Set[i-1] = key;
+            HeapNode current = HeapNode(i);
+            int parent = current.parent;
+            while(current.index > 1 && this->Set[parent-1] > this->Set[current.index-1]){
+                swap(this->Set[parent-1],this->Set[current.index-1]);
+                current = HeapNode(parent);
+                parent  = current.parent;
+            }
+
+        }
+
+        void Insert(int key){
+            int heapSize = len;
+            heapSize++;
+            this->Set.push_back(1000000000);
+            this->DecreaseKey(heapSize,key);
+        }
+
+    private:
+        vector<int> Set;
+        int len;
+       
+};
+
+PriorityQueue::PriorityQueue(const vector<int>& A, string queueType){
+    if(queueType == "max"){
+        maxQueue = new MaxPriorityQueue(A);
+        cout << "copy constructor of PriorityQueue" << endl;
+    }
+    else if(queueType == "min"){
+        minQueue = new MinPriorityQueue(A);
+        cout << "copy constructor of PriorityQueue" << endl;
+    }
+}
+
+PriorityQueue::PriorityQueue(vector<int>&& A, string queueType){
+    if(queueType == "max"){
+        maxQueue = new MaxPriorityQueue(std::move(A));
+        cout << "move constructor of PriorityQueue" << endl;
+    }
+    else if(queueType == "min"){
+        minQueue = new MinPriorityQueue(std::move(A));
+        cout << "move constructor of PriorityQueue" << endl;
+    }
+}
+
+PriorityQueue::~PriorityQueue(){
+    if(maxQueue){
+        delete maxQueue;
+        cout << "PriorityQueue destructor" << endl;
+        maxQueue = nullptr;
+    }
+    if(minQueue){
+        delete minQueue;
+        cout << "PriorityQueue destructor" << endl;
+        minQueue = nullptr;
+    }
+}
+
+void PriorityQueue::PrintQueue() const{
+    if(maxQueue)
+        maxQueue->PrintQueue();
+    else if(minQueue)
+        minQueue->PrintQueue();
+
+}
+
+void PriorityQueue::Insert(int key){
+    if(maxQueue)
+        maxQueue->Insert(key);
+    else if(minQueue)
+        minQueue->Insert(key);
+
+}
+
+//only apply to MinPriorityQueue
+void PriorityQueue::DecreaseKey(int i, int key){
+    
+    if(!minQueue){
+        cout << "initialize minPriorityQueue first" << endl;
+        return;
+    }
+
+    minQueue->DecreaseKey(i,key);
+};
+
+int PriorityQueue::ExtractMinimum(){
+
+    if(!minQueue){
+        cout << "initialize minPriorityQueue first" << endl;
+
+        return 0;
+    }
+
+    return minQueue->ExtractMinimum();
+
+};
+
+int PriorityQueue::Minimum() const{
+
+    if(!minQueue){
+        cout << "initialize minPriorityQueue first" << endl;
+        return 0;
+    }
+
+    return minQueue->Minimum();
+
+};
+
+//only apply to MaxPriorityQueue
+void PriorityQueue::IncreaseKey(int i, int key){
+
+    if(!maxQueue){
+        cout << "initialize maxPriorityQueue first" << endl;
+        return;
+    }
+
+    maxQueue->IncreaseKey(i,key);
+
+};
+
+int PriorityQueue::ExtractMaximum(){
+
+    if(!maxQueue){
+        cout << "initialize maxPriorityQueue first" << endl;
+        return 0;
+    }
+
+    return maxQueue->ExtractMaximum();
+
+};
+
+int PriorityQueue::Maximum() const{
+
+    if(!maxQueue){
+        cout << "initialize maxPriorityQueue first" << endl;
+        return 0;
+    }
+
+    return maxQueue->Maximum();
+
+};    
+
 /*
 int main(int argc, char** argv){
     
@@ -182,6 +448,5 @@ int main(int argc, char** argv){
     for(int i=0;i<len;i++)
         cout << input[i] << " " ;
     cout << endl;
-
 }
 */

@@ -6,24 +6,6 @@
 
 using namespace std;
 
-struct HeapNode{
-    int index;
-    int left;
-    int right;
-    int parent;
-
-    HeapNode(const int i)
-        :index{i},left{2*i},right{2*i+1},parent{i/2}{}
-
-};
-
-void swap(int &a, int &b){
-    int temp = a;
-    a = b;
-    b = temp;
-}
-
-
 void min_Heapify(vector<int> &A, int i, int heapSize){//index i lies between 1 and length of A
 /*
 ///recursive implementation///////////////////////////
@@ -151,6 +133,7 @@ void BuildMinHeap(vector<int> &A){
     for(int i = len/2 ;i >= 1;i--)
         min_Heapify(A,i,heapSize);
 }
+
 
 void BuildMaxHeap(vector<int> &A){
     int len = A.size();
@@ -308,7 +291,7 @@ class MinPriorityQueue{
 
 PriorityQueue::PriorityQueue(const vector<int>& A, string queueType){
     if(queueType == "max"){
-        maxQueue = new MaxPriorityQueue(A);
+        maxQueue = new MaxPriorityQueue(A);//must use new to allocate new memory
         cout << "copy constructor of PriorityQueue" << endl;
     }
     else if(queueType == "min"){
@@ -327,6 +310,7 @@ PriorityQueue::PriorityQueue(vector<int>&& A, string queueType){
         cout << "move constructor of PriorityQueue" << endl;
     }
 }
+
 
 PriorityQueue::~PriorityQueue(){
     if(maxQueue){

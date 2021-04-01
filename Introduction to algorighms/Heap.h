@@ -6,23 +6,41 @@
 
 using namespace std;
 
+struct HeapNode{
+    int index;
+    int left;
+    int right;
+    int parent;
+
+    HeapNode(const int i)
+        :index{i},left{2*i},right{2*i+1},parent{i/2}{}
+
+};
+
+
 void BuildMaxHeap(vector<int> &A);
 //i is the index for counting vector A, ranges between 1 and A.size().heapSize <= A.size()
+
 void max_Heapify(vector<int> &A, int i, int heapSize);
+
 
 void BuildMinHeap(vector<int> &A);
 //i is the index for counting vector A, ranges between 1 and A.size().heapSize <= A.size()
+
 void min_Heapify(vector<int> &A, int i, int heapSize);
 
 void HeapSort(vector<int> &A, int flag);//sorting from small to big if flag == 1. flag == -1 means the opposite
 
+//!!!!!!!!attention
+//don't use copy constructor, move constructor, copy assignment operator, move assignment operator on MaxPriorityQueue, MinPriorityQueue and PriorityQueue
 class MaxPriorityQueue;
 class MinPriorityQueue;
 
-class PriorityQueue{//surrogate class to hide information of true class MaxPriorityQueue and MinPriorityQueue
+class PriorityQueue{//surrogate class to hide information of MaxPriorityQueue and MinPriorityQueue
     public:
         PriorityQueue(const vector<int>& A, string queueType);//queueType == "max" or "min"
         PriorityQueue(vector<int>&& A, string queueType);
+//        PriorityQueue(const PriorityQueue& rhs);
         ~PriorityQueue();
           
         //shared functions
@@ -44,5 +62,7 @@ class PriorityQueue{//surrogate class to hide information of true class MaxPrior
         MinPriorityQueue* minQueue{nullptr};
 
 };
+
+
 
 #endif

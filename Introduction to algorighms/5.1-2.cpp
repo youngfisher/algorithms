@@ -6,7 +6,7 @@
 #include <math.h>
 #include <iostream>
 #include <time.h>
-#include "chapter5_1_2.h" 
+#include "random.h" 
 
 using namespace std;
 

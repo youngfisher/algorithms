@@ -74,49 +74,6 @@ bool sorted::noDataLeft(){
 
 
 
-void min_Heapify(vector<sorted> &A, int i, int heapSize){//index i lies between 1 and length of A
-
-//////////////non-recursive implementation/////////////////////
-    
-    //when smallest == i, means that current node is smaller than its child. break the loop.
-    for(int smallest=0;smallest != i;){//i starts from 1, thus the first comparison will always pass.
-
-        HeapNode current = HeapNode(i);
-        int lt = current.left;
-        int rt = current.right;
-
-        if(lt > heapSize && rt > heapSize)//the current node is a leaf
-            break;
-
-        smallest = lt;        
-
-        if(lt <= heapSize && A[lt-1] > A[i-1])
-            smallest = i;
-
-        if(rt <= heapSize && A[rt-1] < A[smallest-1])
-            smallest = rt;
-
-        if(smallest != i){
-            //swap value in A[i-1] and A[smallest-1]
-            swap(A[i-1],A[smallest-1]);
-
-            //assign the index of smallest value to i and operate on child node.
-            i = smallest;
-            smallest = 0;//to make sure next for loop test pass.
-
-        }
-    }
-//////////////////////////////////////////////////////////////
-
-}
-
-void BuildMinHeap(vector<sorted> &A){
-    int len = A.size();
-    int heapSize = len;
-    for(int i = len/2 ;i >= 1;i--)
-        min_Heapify(A,i,heapSize);
-}
-
 vector<int> K_way_merging(vector<sorted>& input){//the K sorted arrays have to be processed first into a self-defined structure sorted. sorted has three elements.
 
 //the main idea. build a k node min-heap(or max-heap) before selecting the minimum(or maximum) in each iteration, 

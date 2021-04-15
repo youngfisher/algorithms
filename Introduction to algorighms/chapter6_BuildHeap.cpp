@@ -142,6 +142,8 @@ void BuildMaxHeap(vector<int> &A){
         max_Heapify(A,i,heapSize);
 }
 
+//注释代理类实现，已用模板类代替
+/*
 class MaxPriorityQueue{
     
     public:
@@ -181,6 +183,9 @@ class MaxPriorityQueue{
             int max = this->Set[0];
             this->Set[0] = this->Set[heapSize-1];
             heapSize--;
+            //注意，上方heapSize-1意味着vector容器的长度应减少1。同时，剔除的元素与最后一位调换了位置，故而set.popback()即可。如果不执行这一步，剔除的元素仍然在
+            //set里，在后续执行insert时将会出问题
+            Set.pop_back();
             max_Heapify(this->Set,1,heapSize);
             cout << max << endl;
             return max;
@@ -254,6 +259,9 @@ class MinPriorityQueue{
             int min = this->Set[0];
             this->Set[0] = this->Set[heapSize-1];
             heapSize--;
+            //注意，上方heapSize-1意味着vector容器的长度应减少1。同时，剔除的元素与最后一位调换了位置，故而set.popback()即可。如果不执行这一步，剔除的元素仍然在
+            //set里，在后续执行insert时将会出问题
+            Set.pop_back();
             min_Heapify(this->Set,1,heapSize);
             cout << min << endl;
             return min;
@@ -279,7 +287,7 @@ class MinPriorityQueue{
         void Insert(int key){
             int heapSize = len;
             heapSize++;
-            this->Set.push_back(1000000000);
+            this->Set.push_back(1000000000);//vector容器承担了扩容申请空间的工作
             this->DecreaseKey(heapSize,key);
         }
 
@@ -407,8 +415,10 @@ int PriorityQueue::Maximum() const{
 
     return maxQueue->Maximum();
 
-};    
+};
 
+*/
+///////////////////////////////////////////////////////////////////////////////////////////////////
 /*
 int main(int argc, char** argv){
     

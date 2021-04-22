@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -78,6 +79,7 @@ class PriorityQueue{//surrogate class to hide information of MaxPriorityQueue an
 //bool T::operator>(const T& b)
 //void swap(T& first, T& second)
 //使用模板类型，定义自己的类型T时，要注意重载三个函数
+//当然rule of Three/Five 默认需要遵守
 
 template<typename T>
 void BuildMaxHeap(vector<T> &A){
@@ -177,7 +179,7 @@ void HeapSort(vector<T> &A, int flag){//sorting from small to big if flag == 1. 
         for(int i=len,heapSize=len;i>=2;i--){//index for counting lies between 1 and len
             swap(A[i-1],A[0]);
             heapSize--;
-            //这里不需要对A做A.pop_back()因为不存在插入
+            //这里不需要对A做A.pop_back()因为sort过程不存在插入，加上pop_back()也不会错误
             max_Heapify(A,1,heapSize);//index 1 corresponds to A[0]
         }
     }
@@ -188,21 +190,23 @@ void HeapSort(vector<T> &A, int flag){//sorting from small to big if flag == 1. 
         for(int i=len,heapSize=len;i>=2;i--){//index for counting lies between 1 and len
             swap(A[i-1],A[0]);
             heapSize--;
-            //这里不需要对A做A.pop_back()因为不存在插入
+            //这里不需要对A做A.pop_back()因为sort过程不存在插入,加上pop_back()也不会错误
             min_Heapify(A,1,heapSize);//index 1 corresponds to A[0]
         }        
     }
 };
 
+//使用模板类优先队列，需要在自定义T类型内重载> <比较运算符，swap(),赋值运算符(如果T类型内都是内建类型，可以不定义使用默认构造函数即可).定义构造函数T(int n)
 template<typename T>
 class MaxPriorityQueue{
     
     public:
         MaxPriorityQueue(const vector<T>& A){
-            this->Set = A;
+            this->Set = A;//vector能使用=赋值
+//            Set(A);////不可使用构造函数赋值.vector的源代码里构造函数有explicit关键字，阻止了隐式类型转换
             this->len = A.size();
             BuildMaxHeap(this->Set);
-            cout << "copy constructor of MaxPriorityQueue" << endl;
+            cout << "normal constructor of MaxPriorityQueue" << endl;
             
         }
         MaxPriorityQueue(vector<T>&& A){
@@ -211,6 +215,33 @@ class MaxPriorityQueue{
             BuildMaxHeap(Set);
             cout << "move constructor of MaxPriorityQueue" << endl;
         }
+        MaxPriorityQueue(const MaxPriorityQueue& rhs){//copy constructor
+            Set = rhs.Set;
+            len = rhs.len;
+            cout << "copy constructor of MaxPriorityQueue" << endl;
+        }
+               
+        friend void swap(MaxPriorityQueue& first, MaxPriorityQueue& second){
+
+            swap(first.Set,second.Set);
+            swap(first.len,second.len);
+        };
+
+        MaxPriorityQueue(){//default constructor or you can say empty constructor
+
+            len = 0;
+            cout << "empty constructor of MaxPriorityQueue" << endl;
+
+        }
+
+        MaxPriorityQueue& operator=(const MaxPriorityQueue& rhs){
+            MaxPriorityQueue temp(rhs);///////////构造函数调用时类型必须与定义时相同，比如定义const调用时不是const很可能出错
+            swap(*this,temp);//temp will be automatically destroyed
+            cout << "copy assignment operator of MaxPriorityQueue" << endl;
+
+            return (*this);
+        }; 
+
         ~MaxPriorityQueue(){
             cout << "MaxPriorityQueue destructor" << endl;
         }
@@ -222,47 +253,66 @@ class MaxPriorityQueue{
                 cout << endl;
         }
 
-        int Maximum() const{           
+        T Maximum() const{           
             cout << this->Set[0] << endl;
             return this->Set[0];
         }
 
-        int ExtractMaximum(){
+        T ExtractMaximum(){
             int heapSize = len;
             if(heapSize < 1)
                 cout << "heap underflow";
-            int max = this->Set[0];
+            T max = this->Set[0];
             this->Set[0] = this->Set[heapSize-1];
             heapSize--;
             //注意，上方heapSize-1意味着vector容器的长度应减少1。同时，剔除的元素与最后一位调换了位置，故而set.popback()即可。如果不执行这一步，剔除的元素仍然在
             //set里，在后续执行insert时将会出问题
             Set.pop_back();
+            len--;
             max_Heapify(this->Set,1,heapSize);
             cout << max << endl;
             return max;
         }
 
-        void IncreaseKey(int i, int key){//index i ranges between 1 and length of the heap
-            if(key < this->Set[i-1]){
-                cout << "new key is smaller than current key" << endl;
-                return;
+        void SetKey(int i, T key){//index i ranges between 1 and length of the heap
+            if(key > this->Set[i-1]){
+//                cout << "new key is larger than current key" << endl;
+                
+//new key is larger than current key. As all element in the heap already stored in max_heap way, we only need to compare it with its parent and parent's parent
+                this->Set[i-1] = key;
+                HeapNode current = HeapNode(i);
+                int parent = current.parent;
+                while(current.index > 1 && this->Set[parent-1] < this->Set[current.index-1]){
+                    swap(this->Set[parent-1],this->Set[current.index-1]);
+                    current = HeapNode(parent);
+                    parent  = current.parent;
+                }
             }
-            this->Set[i-1] = key;
-            HeapNode current = HeapNode(i);
-            int parent = current.parent;
-            while(current.index > 1 && this->Set[parent-1] < this->Set[current.index-1]){
-                swap(this->Set[parent-1],this->Set[current.index-1]);
-                current = HeapNode(parent);
-                parent  = current.parent;
+
+            else if(key < Set[i-1]){
+//                cout << "new key is smaller than current key" << endl;
+// new key is smaller than current key. As all element in the heap already stored in max_heap way, we need to compare it with its children and children's children, which is exactly max_heapify
+                int heapSize = this->len;
+                this->Set[i-1] = key;
+                max_Heapify(this->Set,i,heapSize);
             }
+
 
         }
 
-        void Insert(int key){
+        //index i ranges between 1 and length of the heap
+        T GetKey(int i){
+            return this->Set[i-1];
+
+        }
+
+        void Insert(T key){
             int heapSize = len;
             heapSize++;
-            this->Set.push_back(-1000);
-            this->IncreaseKey(heapSize,key);
+            T infinite = T(-10000000000);//构造一个非常小的T,亦即优先级非常低，因为是最大优先队列
+            this->Set.push_back(infinite);
+            len++;
+            this->SetKey(heapSize,key);
         }
 
     private:
@@ -270,24 +320,58 @@ class MaxPriorityQueue{
         int len;
        
 };
-
+//T can be any type, usually it would be built-in type such as int, float, double, char and so on
+//使用模板类优先队列，需要在自定义T类型内重载> <比较运算符，swap(),赋值运算符(如果T类型内都是内建类型，可以不定义使用默认构造函数即可).定义构造函数T(int n){n表示优先级}
 template<typename T>
 class MinPriorityQueue{
     
     public:
-        MinPriorityQueue(const vector<T>& A){
-            this->Set = A;
+        MinPriorityQueue(const vector<T>& A){//由给定vector<T>构造优先队列
+            this->Set = A;//vector能使用=赋值
+//            Set(A);//不可使用构造函数赋值.vector的源代码里构造函数有explicit关键字，阻止了隐式类型转换
             this->len = A.size();
             BuildMinHeap(this->Set);
-            cout << "copy constructor of MinPriorityQueue" << endl;
+            cout << "normal constructor of MinPriorityQueue" << endl;
             
         }
-        MinPriorityQueue(vector<T>&& A){
+
+        MinPriorityQueue(vector<T>&& A){//由给定
             len = A.size();
             Set = std::move(A);
             BuildMinHeap(Set);            
-            cout << "move constructor of MinPriorityQueue" << endl;
+            cout 
+            << "move constructor of MinPriorityQueue" << endl;
         }
+
+        MinPriorityQueue(const MinPriorityQueue& rhs){//copy constructor
+            Set = rhs.Set;
+            len = rhs.len;
+            cout << "copy constructor of MinPriorityQueue" << endl;
+        }
+               
+        friend void swap(MinPriorityQueue& first, MinPriorityQueue& second){
+
+            swap(first.Set,second.Set);
+            swap(first.len,second.len);
+        };
+
+        MinPriorityQueue(){//default constructor or you can say empty constructor
+
+            len = 0;
+            cout << "empty constructor of MinPriorityQueue" << endl;
+
+        }
+
+        MinPriorityQueue& operator=(const MinPriorityQueue& rhs){
+            MinPriorityQueue temp(rhs);///////////构造函数调用时类型必须与定义时相同，比如定义const调用时不是const很可能出错
+            swap(*this,temp);//temp will be automatically destroyed
+
+            cout << "copy assignment operator of MinPriorityQueue" << endl;
+
+            return (*this);
+        }; 
+        
+
         ~MinPriorityQueue(){
             cout << "MinPriorityQueue destructor" << endl;
         }
@@ -296,51 +380,67 @@ class MinPriorityQueue{
 
             for(int i=0;i<this->len;i++)
                 cout << this->Set[i] << " ";
-                cout << endl;
+            cout << endl;
         }
 
-        int Minimum() const{           
+        T Minimum() const{           
             cout << this->Set[0] << endl;
             return this->Set[0];
         }
 
-        int ExtractMinimum(){
+        T ExtractMinimum(){
             int heapSize = len;
             if(heapSize < 1)
                 cout << "heap underflow";
-            int min = this->Set[0];
+            T min = this->Set[0];
             this->Set[0] = this->Set[heapSize-1];
             heapSize--;
             //注意，上方heapSize-1意味着vector容器的长度应减少1。同时，剔除的元素与最后一位调换了位置，故而set.popback()即可。如果不执行这一步，剔除的元素仍然在
             //set里，在后续执行insert时将会出问题
             Set.pop_back();
+            len--;
             min_Heapify(this->Set,1,heapSize);
             cout << min << endl;
             return min;
         }
-
-        void DecreaseKey(int i, int key){//index i ranges between 1 and length of the heap
-            if(key > this->Set[i-1]){
-                cout << "new key is larger than current key" << endl;
-                return;
+        //index i ranges between 1 and length of the heap
+        void SetKey(int i, T key){
+            if(key < this->Set[i-1]){
+//                cout << "new key is smaller than current key" << endl;
+//new key is smaller than current key. As all element in the heap already stored in min_heap way, we only need to compare it with its parent and parent's parent                
+                this->Set[i-1] = key;
+                HeapNode current = HeapNode(i);
+                int parent = current.parent;
+                while(current.index > 1 && this->Set[parent-1] > this->Set[current.index-1]){
+                    swap(this->Set[parent-1],this->Set[current.index-1]);
+                    current = HeapNode(parent);
+                    parent  = current.parent;
+                }
+            }
+            else if(key > Set[i-1]){
+//                cout << "new key is larger than current key" << endl;
+// new key is larger than current key. As all element in the heap already stored in min_heap way, we need to compare it with its children and children's children, which is exactly min_heapify
+                int heapSize = this->len;
+                this->Set[i-1] = key;
+                min_Heapify(this->Set,i,heapSize);
             }
 
-            this->Set[i-1] = key;
-            HeapNode current = HeapNode(i);
-            int parent = current.parent;
-            while(current.index > 1 && this->Set[parent-1] > this->Set[current.index-1]){
-                swap(this->Set[parent-1],this->Set[current.index-1]);
-                current = HeapNode(parent);
-                parent  = current.parent;
-            }
+
+        }
+        //index i ranges between 1 and length of the heap
+        T GetKey(int i){
+            return this->Set[i-1];
 
         }
 
-        void Insert(int key){
+        void Insert(T key){
             int heapSize = len;
             heapSize++;
-            this->Set.push_back(1000000000);//vector容器承担了扩容申请空间的工作
-            this->DecreaseKey(heapSize,key);
+            long int infinite = 10000000;
+            T temp = T(infinite);//构造一个优先级数值非常大的T，亦即优先级非常低，因为是最小优先队列
+            this->Set.push_back(infinite);//vector容器承担了扩容申请空间的工作
+            len++;
+            this->SetKey(heapSize,key);
         }
 
     private:

@@ -6,6 +6,8 @@
 #include "matrix_chain_multiplication_least_times.h"
 #include "Heap.h"
 #include "K_way_merging.h"
+#include "Queue.h"
+#include "Stack.h"
 
 
 #endif

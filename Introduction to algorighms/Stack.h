@@ -79,8 +79,15 @@ class Queue{
         };
         //rule of Three
         Queue(const Queue& rhs){
-            size = rhs.size;
-            Set = rhs.Set;
+            //新写法，考虑到了复制rhs时，对rhs内优先级的数值做一次瘦身。这是因为队列的实现方式导致里面的优先级数据只会不断增加，这里通过复制将优先级数据从1开始重新计数
+            size = A.size();
+            for(int i=1;i<=size;i++){//从序号1开始遍历rhs
+                Set.Insert(data(i,rhs.Set[i-1].value));//i为优先级，rhs.Set[i-1].value 为原队列中第i个的data元素的值.
+            }
+
+            //原来的写法，直接复制了rhs的内容
+            //size = rhs.size;
+            //Set = rhs.Set;
         };
 
         Queue(){
@@ -109,9 +116,14 @@ class Queue{
 
         }
 
+        //这个栈内优先级的赋值会不断增加，如果长期运行可能有问题.最好在某个时间清零一次或者重新赋值一次，参见上面的赋值构造函数
         void Push(T v){//入栈，未指定优先级，常规用法
-            size++;//队列长+1，当前元素优先级等于队列长度
-            Set.Insert(data(size,v));
+        //原本简单写法，直接把当前入队列优先级设置为队列长度加1.问题在于忽略了出队列导致的队列长度与优先级不匹配
+        //当前长度加出队列次数才是队列内最后一个元素的优先级
+        //当前元素优先级等于最后一个元素的优先级+1
+            size++;
+            int current_priority = size + dequeue_count;
+            Set.Insert(data(current_priority,v));
 
         };
 
@@ -141,6 +153,7 @@ class Queue{
                 return -1;
             }
             size--;
+            pop_count++;
             return Set.ExtractMaximum().value;
         };
 
@@ -148,8 +161,8 @@ class Queue{
 
         int size;//该变量保存队列当前大小
         MaxPriorityQueue<data> Set;//
+        int pop_count = 0;
     
 };
-
 
 # endif

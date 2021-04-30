@@ -93,7 +93,7 @@ class Queue{
         //rule of Three
         Queue(const Queue& rhs){
             //新写法，考虑到了复制rhs时，对rhs内优先级的数值做一次瘦身。这是因为队列的实现方式导致里面的优先级数据只会不断增加，这里通过复制将优先级数据从1开始重新计数
-            size = A.size();
+            size = rhs.size();
             for(int i=1;i<=size;i++){//从序号1开始遍历rhs
                 Set.Insert(data(i,rhs.Set[i-1].value));//i为优先级，rhs.Set[i-1].value 为原队列中第i个的data元素的值.
             }
@@ -167,6 +167,8 @@ class Queue{
             }
             size--;
             dequeue_count ++;
+            if(size==0)
+                dequeue_count = 0;
             return Set.ExtractMinimum().value;
         };
 

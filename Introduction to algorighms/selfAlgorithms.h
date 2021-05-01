@@ -8,6 +8,8 @@
 #include "K_way_merging.h"
 #include "Queue.h"
 #include "Stack.h"
+#include "Hash.h"
+#include "list.h"
 
 
 #endif

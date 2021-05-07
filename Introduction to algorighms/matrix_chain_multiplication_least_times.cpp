@@ -1,9 +1,25 @@
-#include <iostream>
-#include <time.h>
-#include <vector>
 #include <stdio.h>
-#include "matrix_chain_multiplication_least_times.h"
+#include <algorithm>
+#include <iostream>
+#include <vector>
+#include <time.h>
+#include "Matrix_chain_least_multiple.h"
+
 using namespace std;
+
+//use recursive to print parenthese of the multiplication
+void print_parenthese(int* s,int i, int j,int size){//s原本为2维数组，为了传递参数，降低到1维. i,j为打印的乘法序列首位序号，从1到n. size为二维数组列长度
+    if(i==j)
+        printf("A%d",i);
+    else{
+        printf("(");
+        int test = *(s+i*size+j);
+        print_parenthese(s,i,test,size);
+        print_parenthese(s,test+1,j,size);
+        printf(")");
+    }
+}
+
 
 int matrix_chain_multiplication(vector<int>& input){
 
@@ -18,7 +34,7 @@ int matrix_chain_multiplication(vector<int>& input){
 
     //number of input matrix
     int n = number - 1;
-    int m[number][number];
+    int m[number][number];//C99
     int s[number][number];
 
 //matirx chain start at i and ends at j.  m[i][j] store the cost to calculate the chain between i and j. thus m[i][i]=0     
@@ -35,9 +51,10 @@ int matrix_chain_multiplication(vector<int>& input){
 
             for(int k=i;k<=j-1;k++){
                 cost = m[i][k] + m[k+1][j] + input[i-1]*input[k]*input[j];
-                if(cost<m[i][j])
+                if(cost<m[i][j]){
                     m[i][j] = cost;
                     s[i][j] = k;
+                }
             }
 
         }
@@ -48,8 +65,36 @@ int matrix_chain_multiplication(vector<int>& input){
     cout << "least times of multiplication:" << m[1][n] << endl;
     cout << "time consumed:" << time << endl;
 
-    //to output the parenthesization of matrix, tree data structure is required. To be fulfilled.
-    //output the parenthesization
+    print_parenthese(*s,1,n,number);//*s表示从二维数组变为1维数组
+
 
     return 0;
+}
+
+
+int main(int argc, char** argv){
+
+/*
+    int size = 500;
+    int input[size];
+    int number=0;
+    int c;
+    while((c=getchar())!='\n'){
+        ungetc(c,stdin);//direct to input iostream
+        cin >> input[number++];
+    }
+
+*/
+
+    vector<int> input;
+    int c;
+    while((c=getchar())!='\n'){
+        ungetc(c,stdin);//direct to input iostream
+        cin >> c;
+        input.push_back(c);
+    }
+
+    matrix_chain_multiplication(input);
+
+
 }

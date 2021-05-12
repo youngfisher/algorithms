@@ -6,13 +6,12 @@
 
 using namespace std;
 
-
 //参见Queue获得注释说明
 
 //Stack实现与Queue实现思路一致，序号赋值部分相同，不同之处在于使用最大优先队列。后入栈的序号最大，使用最大优先队列就获得了最高优先级
 
 template<typename T>
-class Queue{
+class Stack{
 
     private:
 
@@ -27,7 +26,7 @@ class Queue{
                     value = v;
                 }
 
-                data(const long int i){
+                data(const long long int i){
                     priority_level = i;
                 }
 
@@ -70,7 +69,7 @@ class Queue{
     public:
     
         
-        Queue(const vector<T>& A){
+        Stack(const vector<T>& A){
             size = A.size();
             for(int i=1;i<=size;i++){//从序号1开始遍历vector
                 Set.Insert(data(i,A[i-1]));//i为优先级，A[i-1]为当前优先级对应的实际值
@@ -78,7 +77,7 @@ class Queue{
             }
         };
         //rule of Three
-        Queue(const Queue& rhs){
+        Stack(const Stack& rhs){
             //新写法，考虑到了复制rhs时，对rhs内优先级的数值做一次瘦身。这是因为队列的实现方式导致里面的优先级数据只会不断增加，这里通过复制将优先级数据从1开始重新计数
             size = rhs.size();
             for(int i=1;i<=size;i++){//从序号1开始遍历rhs
@@ -90,21 +89,21 @@ class Queue{
             //Set = rhs.Set;
         };
 
-        Queue(){
+        Stack(){
             size = 0;
 
         };
-        ~Queue(){
+        ~Stack(){
 
         };
 
-        friend void swap(Queue& first, Queue& second){
+        friend void swap(Stack& first, Stack& second){
             swap(first.size,second.size);
             swap(first.Set,second.Set);
         }
 
-        Queue& operator=(const Queue& rhs){
-            Queue temp(rhs);
+        Stack& operator=(const Stack& rhs){
+            Stack temp(rhs);
             swap(*this,temp);
 
             return *this;
@@ -159,9 +158,13 @@ class Queue{
             return Set.ExtractMaximum().value;
         };
 
+        bool IsEmpty(){
+            return size==0;
+        }
+
     private:
 
-        int size;//该变量保存队列当前大小
+        int size;//该变量保存栈当前大小
         MaxPriorityQueue<data> Set;//
         int pop_count = 0;
     

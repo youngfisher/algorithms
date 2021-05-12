@@ -206,19 +206,19 @@ class MaxPriorityQueue{
 //            Set(A);////不可使用构造函数赋值.vector的源代码里构造函数有explicit关键字，阻止了隐式类型转换
             this->len = A.size();
             BuildMaxHeap(this->Set);
-            cout << "normal constructor of MaxPriorityQueue" << endl;
+//            cout << "normal constructor of MaxPriorityQueue" << endl;
             
         }
         MaxPriorityQueue(vector<T>&& A){
             len = A.size();
             Set = std::move(A);
             BuildMaxHeap(Set);
-            cout << "move constructor of MaxPriorityQueue" << endl;
+//            cout << "move constructor of MaxPriorityQueue" << endl;
         }
         MaxPriorityQueue(const MaxPriorityQueue& rhs){//copy constructor
             Set = rhs.Set;
             len = rhs.len;
-            cout << "copy constructor of MaxPriorityQueue" << endl;
+//            cout << "copy constructor of MaxPriorityQueue" << endl;
         }
                
         friend void swap(MaxPriorityQueue& first, MaxPriorityQueue& second){
@@ -230,20 +230,20 @@ class MaxPriorityQueue{
         MaxPriorityQueue(){//default constructor or you can say empty constructor
 
             len = 0;
-            cout << "empty constructor of MaxPriorityQueue" << endl;
+//            cout << "empty constructor of MaxPriorityQueue" << endl;
 
         }
 
         MaxPriorityQueue& operator=(const MaxPriorityQueue& rhs){
             MaxPriorityQueue temp(rhs);///////////构造函数调用时类型必须与定义时相同，比如定义const调用时不是const很可能出错
             swap(*this,temp);//temp will be automatically destroyed
-            cout << "copy assignment operator of MaxPriorityQueue" << endl;
+//            cout << "copy assignment operator of MaxPriorityQueue" << endl;
 
             return (*this);
         }; 
 
         ~MaxPriorityQueue(){
-            cout << "MaxPriorityQueue destructor" << endl;
+//            cout << "MaxPriorityQueue destructor" << endl;
         }
 
         void PrintQueue() const{
@@ -270,7 +270,7 @@ class MaxPriorityQueue{
             Set.pop_back();
             len--;
             max_Heapify(this->Set,1,heapSize);
-            cout << max << endl;
+//            cout << max << endl;
             return max;
         }
 
@@ -307,11 +307,11 @@ class MaxPriorityQueue{
         }
 
         void Insert(T key){
-            int heapSize = len;
-            heapSize++;
+
             T infinite = T(-10000000000);//构造一个非常小的T,亦即优先级非常低，因为是最大优先队列
             this->Set.push_back(infinite);
             len++;
+            int heapSize = len;            
             this->SetKey(heapSize,key);
         }
 
@@ -434,12 +434,12 @@ class MinPriorityQueue{
         }
 
         void Insert(T key){
-            int heapSize = len;
-            heapSize++;
+
             long int infinite = 10000000;
             T temp = T(infinite);//构造一个优先级数值非常大的T，亦即优先级非常低，因为是最小优先队列
             this->Set.push_back(infinite);//vector容器承担了扩容申请空间的工作
             len++;
+            int heapSize = len;            
             this->SetKey(heapSize,key);
         }
 
